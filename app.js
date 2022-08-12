@@ -1,4 +1,4 @@
-let showGridLines = false
+let showGridLines, allowRainbow, allowFade = false
 
 // functions
 const addCells = (size) => {
@@ -7,7 +7,6 @@ const addCells = (size) => {
     for (i = 0; i < Math.pow(size, 2); i++) {
         cell = document.createElement('div')
         cell.className = `cell ${showGridLines ? 'grid-lines' : ''}`
-        addEvent(cell, 'mouseenter', toggleRandomColor)
         gridContainer.appendChild(cell)
     }
 }
@@ -16,7 +15,28 @@ const addEvent = (el, type, func) => {
     el.addEventListener(type, func)
 }
 
-const toggleRandomColor = (e) => {
+const removeEvent = (el, type, func) => {
+    el.removeEventListener(type, func)
+}
+
+const toggleRainbow = (e) => {
+    if (allowRainbow) {
+        document.querySelectorAll('.cell').forEach(cell => {
+            addEvent(cell, 'mouseenter', assignRandomColor)
+            allowRainbow = !allowRainbow
+        })
+    } else {
+        document.querySelectorAll('.cell').forEach(cell => {
+            removeEvent(cell, 'mouseenter', assignRandomColor)
+            allowRainbow = !allowRainbow
+        })
+    }
+
+
+
+}
+
+const assignRandomColor = (e) => {
     e.currentTarget.style.backgroundColor = `rgb(
     ${Math.random() * 256}, 
     ${Math.random() * 256}, 
@@ -74,10 +94,17 @@ color.className = 'color'
 color.type = 'number'
 color.placeholder = 'enter a hex color'
 
-const toggleButton = document.createElement('button')
-toggleButton.className = 'toggle-grid-lines'
-toggleButton.innerHTML = 'Toggle Grid lines';
-addEvent(toggleButton, 'click', toggleGridLines)
+const createToggleButton = (name, toggleFunc) => {
+    const toggleButton = document.createElement('button')
+    toggleButton.className = name.toLowerCase().split(' ').join('-')
+    toggleButton.innerHTML = name;
+    addEvent(toggleButton, 'click', toggleFunc)
+    return toggleButton
+}
+
+const gridLineToggleButton = createToggleButton('Toggle Grid Lines', toggleGridLines)
+const rainbowToggleButton = createToggleButton('Toggle Rainbow', toggleRainbow)
+const fadeToggleButton = createToggleButton('Toggle Fade', toggleFade)
 
 
 // main
@@ -87,7 +114,7 @@ addCells(32)
 // appends
 userControlsContainer.append(cellSizeInput)
 userControlsContainer.append(color)
-userControlsContainer.append(toggleButton)
+userControlsContainer.append(gridLineToggleButton)
 userControlsContainer.append(clear)
 box.append(gridContainer);
 document.getElementById('root').append(userControlsContainer)
