@@ -1,4 +1,7 @@
-let showGridLines, allowRainbow, allowFade = false
+let normalModeIsSelected, showGridLines, rainbowModeIsSelected, fadeModeIsSelected = false
+
+let normalModeColor = '#000000'
+let backgroundColor = '#ffffff'
 
 // functions
 const addCells = (size) => {
@@ -11,37 +14,38 @@ const addCells = (size) => {
     }
 }
 
-const addEvent = (el, type, func) => {
-    el.addEventListener(type, func)
-}
+const toggleNormalMode = () => {
+    if (rainbowModeIsSelected) toggleRainbowMode();
 
-const removeEvent = (el, type, func) => {
-    el.removeEventListener(type, func)
-}
+    normalModeIsSelected = !normalModeIsSelected
 
-const toggleRainbow = (e) => {
-    if (allowRainbow) {
-        document.querySelectorAll('.cell').forEach(cell => {
-            addEvent(cell, 'mouseenter', assignRandomColor)
-            allowRainbow = !allowRainbow
-        })
+    if (normalModeIsSelected) {
+        queryCellsAndAddEventListenerToEach('mouseenter', assignBgColorToCell)
     } else {
-        document.querySelectorAll('.cell').forEach(cell => {
-            removeEvent(cell, 'mouseenter', assignRandomColor)
-            allowRainbow = !allowRainbow
-        })
+        queryCellsAndRemoveEventListenerFromEach('mouseenter', assignBgColorToCell)
     }
-
-
-
 }
 
-const assignRandomColor = (e) => {
-    e.currentTarget.style.backgroundColor = `rgb(
-    ${Math.random() * 256}, 
-    ${Math.random() * 256}, 
-    ${Math.random() * 256}
-    )`
+const toggleFadeMode = () => {
+    fadeModeIsSelected = !fadeModeIsSelected
+
+    if (fadeModeIsSelected) {
+        queryCellsAndAddEventListenerToEach('mouseleave', fadeCell)
+    } else {
+        queryCellsAndRemoveEventListenerFromEach('mouseleave', fadeCell)
+    }
+}
+
+const toggleRainbowMode = () => {
+    if (normalModeIsSelected) toggleNormalMode();
+
+    rainbowModeIsSelected = !rainbowModeIsSelected
+
+    if (rainbowModeIsSelected) {
+        queryCellsAndAddEventListenerToEach('mouseenter', assignRandomBgColorToCell)
+    } else {
+        queryCellsAndRemoveEventListenerFromEach('mouseenter', assignRandomBgColorToCell)
+    }
 }
 
 const toggleGridLines = () => {
@@ -50,6 +54,70 @@ const toggleGridLines = () => {
         cell.classList.toggle('grid-lines')
     })
 }
+
+const fadeCell = (e) => {
+    const cell = e.currentTarget
+    let rgbValuesArray = parseRGBvalueFromCSSstring(cell.style.backgroundColor)
+
+    let fadeTimer = setInterval(() => {
+        rgbValuesArray = rgbValuesArray.map(value => valueToBeAddedForDesiredColor(value))
+        let [red, green, blue] = rgbValuesArray
+
+        setElementBgColor(cell, createCSSstringRGB(red, green, blue))
+
+        if (rgbValuesArray.every(value => value === 255)) {
+            clearInterval(fadeTimer)
+        }
+
+    }, 100)
+}
+
+const queryCellsAndAddEventListenerToEach = (eventType, eventCallback) => {
+    document.querySelectorAll('.cell').forEach(cell => cell.addEventListener(eventType, eventCallback))
+}
+
+const queryCellsAndRemoveEventListenerFromEach = (eventType, eventCallback) => {
+    document.querySelectorAll('.cell').forEach(cell => cell.removeEventListener(eventType, eventCallback))
+}
+
+const assignRandomBgColorToCell = (e) => {
+    setElementBgColor(e.currentTarget, createCSSstringRGB(Math.random() * 256, Math.random() * 256, Math.random() * 256))
+
+}
+
+const assignBgColorToCell = (e) => {
+    let [red, green, blue] = convertHexToRGB(document.querySelector('.color').value)
+    setElementBgColor(e.currentTarget, createCSSstringRGB(red, green, blue))
+}
+
+const parseRGBvalueFromCSSstring = CSSstring =>
+    CSSstring
+        .split('')
+        .slice(4, CSSstring.length - 1)
+        .join('')
+        .split(',')
+        .map(val => Number(val))
+
+const valueToBeAddedForDesiredColor = (value) => value += Math.ceil((255 - value) * .6)
+
+const convertHexToRGB = hex =>
+    hex
+        .slice(1)
+        .match(/[a-f\d][a-f\d]/g)
+        .map(value => parseInt(value, 16))
+
+const setElementBgColor = (element, color) => element.style.backgroundColor = color
+
+const createSingleValuedCSSstringRGB = (color) => createCSSstringRGB(color, color, color)
+
+const createCSSstringRGB = (red, green, blue) =>
+    `rgb(
+    ${red},
+    ${green},
+    ${blue}
+    )`
+
+
 
 const retileCells = (e) => {
     gridContainer.innerHTML = ''
@@ -60,6 +128,9 @@ const clearCells = () => {
     document.querySelectorAll('.cell').forEach(cell =>
         cell.style.backgroundColor = 'white')
 }
+
+const querySelectAllCells = () => document.querySelectorAll('.cell')
+
 
 
 // elements
@@ -80,31 +151,33 @@ userControlsContainer.className = 'controls-container'
 const clear = document.createElement('button')
 clear.className = 'clear'
 clear.innerText = 'clear'
-addEvent(clear, 'click', clearCells)
+clear.addEventListener('click', clearCells)
 
 const cellSizeInput = document.createElement('input')
 cellSizeInput.className = 'cell-size-input'
 cellSizeInput.type = 'number'
 cellSizeInput.placeholder = 'enter how many cells'
 cellSizeInput.min = 0
-addEvent(cellSizeInput, 'change', retileCells)
+cellSizeInput.addEventListener('change', retileCells)
 
 const color = document.createElement('input')
 color.className = 'color'
-color.type = 'number'
-color.placeholder = 'enter a hex color'
+color.type = 'color'
+color.value = normalModeColor
+
 
 const createToggleButton = (name, toggleFunc) => {
     const toggleButton = document.createElement('button')
     toggleButton.className = name.toLowerCase().split(' ').join('-')
     toggleButton.innerHTML = name;
-    addEvent(toggleButton, 'click', toggleFunc)
+    toggleButton.addEventListener('click', toggleFunc)
     return toggleButton
 }
 
+const normalModeToggleButton = createToggleButton('Toggle Normal Mode', toggleNormalMode)
 const gridLineToggleButton = createToggleButton('Toggle Grid Lines', toggleGridLines)
-const rainbowToggleButton = createToggleButton('Toggle Rainbow', toggleRainbow)
-const fadeToggleButton = createToggleButton('Toggle Fade', toggleFade)
+const rainbowModeToggleButton = createToggleButton('Toggle Rainbow Mode', toggleRainbowMode)
+const fadeModeToggleButton = createToggleButton('Toggle Fade Mode', toggleFadeMode)
 
 
 // main
@@ -113,8 +186,12 @@ addCells(32)
 
 // appends
 userControlsContainer.append(cellSizeInput)
+
 userControlsContainer.append(color)
+userControlsContainer.append(normalModeToggleButton)
 userControlsContainer.append(gridLineToggleButton)
+userControlsContainer.append(rainbowModeToggleButton)
+userControlsContainer.append(fadeModeToggleButton)
 userControlsContainer.append(clear)
 box.append(gridContainer);
 document.getElementById('root').append(userControlsContainer)
