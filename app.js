@@ -157,6 +157,7 @@ const cellSizeInput = document.createElement('input')
 cellSizeInput.className = 'cell-size-input'
 cellSizeInput.type = 'number'
 cellSizeInput.placeholder = 'enter how many cells'
+cellSizeInput.max = 64
 cellSizeInput.min = 0
 cellSizeInput.addEventListener('change', retileCells)
 
@@ -168,7 +169,7 @@ color.value = normalModeColor
 
 const createToggleButton = (name, toggleFunc) => {
     const toggleButton = document.createElement('button')
-    toggleButton.className = name.toLowerCase().split(' ').join('-')
+    toggleButton.className = `${name.toLowerCase().split(' ').join('-')} toggle-btn`
     toggleButton.innerHTML = name;
     toggleButton.addEventListener('click', toggleFunc)
     return toggleButton
@@ -179,20 +180,24 @@ const gridLineToggleButton = createToggleButton('Toggle Grid Lines', toggleGridL
 const rainbowModeToggleButton = createToggleButton('Toggle Rainbow Mode', toggleRainbowMode)
 const fadeModeToggleButton = createToggleButton('Toggle Fade Mode', toggleFadeMode)
 
+const normalModeContainer = document.createElement('div')
+normalModeContainer.className = 'normalModeContainer'
 
 // main
 addCells(32)
 
 
 // appends
-userControlsContainer.append(cellSizeInput)
+normalModeContainer.append(normalModeToggleButton)
+normalModeContainer.append(color)
 
-userControlsContainer.append(color)
-userControlsContainer.append(normalModeToggleButton)
+userControlsContainer.append(cellSizeInput)
+userControlsContainer.append(normalModeContainer)
 userControlsContainer.append(gridLineToggleButton)
 userControlsContainer.append(rainbowModeToggleButton)
 userControlsContainer.append(fadeModeToggleButton)
 userControlsContainer.append(clear)
+
 box.append(gridContainer);
 document.getElementById('root').append(userControlsContainer)
 document.getElementById('root').append(box)
