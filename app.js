@@ -14,10 +14,11 @@ const addCells = (size) => {
     }
 }
 
-const toggleNormalMode = () => {
-    if (rainbowModeIsSelected) toggleRainbowMode();
+const toggleNormalMode = (e) => {
+    if (rainbowModeIsSelected) toggleRainbowMode({ currentTarget: rainbowModeToggleButton });
 
     normalModeIsSelected = !normalModeIsSelected
+    e.currentTarget.classList.toggle('selected', normalModeIsSelected)
 
     if (normalModeIsSelected) {
         queryCellsAndAddEventListenerToEach('mouseenter', assignBgColorToCell)
@@ -26,8 +27,9 @@ const toggleNormalMode = () => {
     }
 }
 
-const toggleFadeMode = () => {
+const toggleFadeMode = (e) => {
     fadeModeIsSelected = !fadeModeIsSelected
+    e.currentTarget.classList.toggle('selected', fadeModeIsSelected)
 
     if (fadeModeIsSelected) {
         queryCellsAndAddEventListenerToEach('mouseleave', fadeCell)
@@ -36,10 +38,11 @@ const toggleFadeMode = () => {
     }
 }
 
-const toggleRainbowMode = () => {
-    if (normalModeIsSelected) toggleNormalMode();
+const toggleRainbowMode = (e) => {
+    if (normalModeIsSelected) toggleNormalMode({ currentTarget: normalModeToggleButton });
 
     rainbowModeIsSelected = !rainbowModeIsSelected
+    e.currentTarget.classList.toggle('selected', rainbowModeIsSelected)
 
     if (rainbowModeIsSelected) {
         queryCellsAndAddEventListenerToEach('mouseenter', assignRandomBgColorToCell)
@@ -48,8 +51,9 @@ const toggleRainbowMode = () => {
     }
 }
 
-const toggleGridLines = () => {
+const toggleGridLines = (e) => {
     showGridLines = !showGridLines
+    e.currentTarget.classList.toggle('selected', showGridLines)
     document.querySelectorAll('.cell').forEach(cell => {
         cell.classList.toggle('grid-lines')
     })
@@ -117,8 +121,6 @@ const createCSSstringRGB = (red, green, blue) =>
     ${blue}
     )`
 
-
-
 const retileCells = (e) => {
     gridContainer.innerHTML = ''
     addCells(e.target.value)
@@ -144,6 +146,13 @@ box.className = 'box'
 
 const gridContainer = document.createElement('div')
 gridContainer.className = 'grid-container'
+
+const sidePanelContainer = document.createElement('div')
+sidePanelContainer.className = 'side-panel-container'
+
+const title = document.createElement('h1')
+title.textContent = 'Etch-a-Sketch'
+title.className = 'title'
 
 const userControlsContainer = document.createElement('div')
 userControlsContainer.className = 'controls-container'
@@ -199,7 +208,9 @@ userControlsContainer.append(fadeModeToggleButton)
 userControlsContainer.append(clear)
 
 box.append(gridContainer);
-document.getElementById('root').append(userControlsContainer)
+sidePanelContainer.append(title);
+sidePanelContainer.append(userControlsContainer);
+document.getElementById('root').append(sidePanelContainer)
 document.getElementById('root').append(box)
 
 console.log('hello')

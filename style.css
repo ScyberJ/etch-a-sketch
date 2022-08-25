@@ -1,7 +1,20 @@
+@import url("https://fonts.googleapis.com/css2?family=Aboreto&display=swap");
+
+:root {
+  --primary-color: #a99985;
+  --secondary-color: #d79921;
+  --tertairy-color: #b9bb27;
+  --selected-color: #98971a;
+  --bg-color: #282929;
+  --text-color: rgb(255, 251, 223);
+}
+
 * {
   margin: 0;
   box-sizing: border-box;
-  background-color: rgb(33, 40, 45);
+  background-color: var(--bg-color);
+  font-family: "Aboreto", cursive;
+  color: var(--text-color);
 }
 
 body {
@@ -35,8 +48,18 @@ body {
   margin: 2px 0;
 }
 
+.cell-size-input {
+  background: var(--bg-color);
+  color: var(--text-color);
+  border-radius: 10px;
+  padding: 20px 10px;
+  margin: 10px 0;
+  width: 100%;
+}
+
 .clear {
   width: fit-content;
+  height: auto;
 }
 
 .box {
@@ -60,28 +83,46 @@ body {
   border: 1px solid rgba(0, 0, 0, 20%);
 }
 
+.title {
+  font-size: 4vw;
+  text-align: center;
+  margin-bottom: 20px;
+}
+
 .controls-container {
+  background-color: var(--primary-color);
+  padding: 20px;
+  border-radius: 10px;
+  width: 30vw;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: flex-start;
+  box-shadow: -10px 10px 0 5px #000;
 }
 
 .toggle-btn,
 .clear {
-  background-color: rgb(39, 68, 88);
-  color: rgb(255, 255, 255);
+  background-color: var(--secondary-color);
+  color: var(--text-color);
   padding: 10px 20px;
   margin: 10px 0;
   width: 100%;
   border: none;
+  border-radius: 10px;
+  transition: background-color 0.3s;
+  box-shadow: -5px 5px 0 0 var(--bg-color);
 }
 
-.toggle-btn:hover {
-  background-color: rgb(65, 85, 120);
+.toggle-btn:hover,
+.clear:hover {
+  background-color: var(--tertairy-color);
+  transform: translate(2px, -2px);
+  box-shadow: -7px 7px 0 0 var(--bg-color);
 }
 
 .normalModeContainer {
+  background-color: var(--primary-color);
   display: flex;
   flex-shrink: 1;
   margin: 10px 0;
@@ -93,17 +134,19 @@ body {
 }
 
 .normalModeContainer .color {
+  background-color: transparent;
   flex-shrink: 4;
   height: auto;
   border: none;
+  border-radius: 10px;
 }
 
 .normalModeContainer .toggle-btn,
 .normalModeContainer .color {
   width: 100%;
-  margin: 0;
+  margin: 0 1px;
 }
 
 .selected {
-  background-color: rgb(45, 72, 93);
+  background-color: var(--selected-color);
 }
